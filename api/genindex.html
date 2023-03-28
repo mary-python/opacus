@@ -135,10 +135,10 @@
 </li>
 <li><a href="dp_rnn.html#opacus.layers.dp_rnn.DPGRUCell">DPGRUCell (class in opacus.layers.dp_rnn)</a>
 </li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="dp_rnn.html#opacus.layers.dp_rnn.DPLSTM">DPLSTM (class in opacus.layers.dp_rnn)</a>
 </li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="dp_rnn.html#opacus.layers.dp_rnn.DPLSTMCell">DPLSTMCell (class in opacus.layers.dp_rnn)</a>
 </li>
 <li><a href="dp_multihead_attention.html#opacus.layers.dp_multihead_attention.DPMultiheadAttention">DPMultiheadAttention (class in opacus.layers.dp_multihead_attention)</a>
@@ -155,16 +155,14 @@
 </li>
 <li><a href="dp_rnn.html#opacus.layers.dp_rnn.DPRNNCellBase">DPRNNCellBase (class in opacus.layers.dp_rnn)</a>
 </li>
+<li><a href="data_loader.html#opacus.data_loader.dtype_safe">dtype_safe() (in module opacus.data_loader)</a>
+</li>
 </ul></td>
 </tr></table>
 <h2 id="E">E</h2>
 <table class="indextable genindextable" style="width: 100%"><tr>
 <td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="grad_sample_module.html#opacus.grad_sample.grad_sample_module.GradSampleModule.enable_hooks">enable_hooks() (opacus.grad_sample.grad_sample_module.GradSampleModule method)</a>
-</li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
-<li><a href="noise_scheduler.html#opacus.scheduler.ExponentialNoise">ExponentialNoise (class in opacus.scheduler)</a>
 </li>
 </ul></td>
 </tr></table>
@@ -252,8 +250,6 @@
 <h2 id="L">L</h2>
 <table class="indextable genindextable" style="width: 100%"><tr>
 <td style="width: 33%; vertical-align: top;"><ul>
-<li><a href="noise_scheduler.html#opacus.scheduler.LambdaNoise">LambdaNoise (class in opacus.scheduler)</a>
-</li>
 <li><a href="accounting/iaccountant.html#opacus.accountants.accountant.IAccountant.load_state_dict">load_state_dict() (opacus.accountants.accountant.IAccountant method)</a>
 <ul>
 <li><a href="dp_multihead_attention.html#opacus.layers.dp_multihead_attention.DPMultiheadAttention.load_state_dict">(opacus.layers.dp_multihead_attention.DPMultiheadAttention method)</a>
@@ -308,8 +304,6 @@
 <li><a href="optim/dp_per_layer_optimizer.html#module-opacus.optimizers.perlayeroptimizer">opacus.optimizers.perlayeroptimizer</a>
 </li>
 <li><a href="privacy_engine.html#module-opacus.privacy_engine">opacus.privacy_engine</a>
-</li>
-<li><a href="noise_scheduler.html#module-opacus.scheduler">opacus.scheduler</a>
 </li>
 <li><a href="compute_dp_sgd_privacy.html#module-opacus.scripts.compute_dp_sgd_privacy">opacus.scripts.compute_dp_sgd_privacy</a>
 </li>
@@ -414,6 +408,8 @@
 <li><a href="optim/dp_ddp_optimizer.html#module-opacus.optimizers.ddpoptimizer">module</a>
 </li>
 </ul></li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li>
     opacus.optimizers.optimizer
 
@@ -421,8 +417,6 @@
 <li><a href="optim/dp_optimizer.html#module-opacus.optimizers.optimizer">module</a>
 </li>
 </ul></li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li>
     opacus.optimizers.perlayeroptimizer
 
@@ -435,13 +429,6 @@
 
       <ul>
 <li><a href="privacy_engine.html#module-opacus.privacy_engine">module</a>
-</li>
-</ul></li>
-<li>
-    opacus.scheduler
-
-      <ul>
-<li><a href="noise_scheduler.html#module-opacus.scheduler">module</a>
 </li>
 </ul></li>
 <li>
@@ -560,6 +547,8 @@
 </li>
 <li><a href="accounting/iaccountant.html#opacus.accountants.accountant.IAccountant.state_dict">state_dict() (opacus.accountants.accountant.IAccountant method)</a>
 <ul>
+<li><a href="dp_multihead_attention.html#opacus.layers.dp_multihead_attention.DPMultiheadAttention.state_dict">(opacus.layers.dp_multihead_attention.DPMultiheadAttention method)</a>
+</li>
 <li><a href="optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.state_dict">(opacus.optimizers.optimizer.DPOptimizer method)</a>
 </li>
 </ul></li>
@@ -576,8 +565,6 @@
 <li><a href="optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.step">(opacus.optimizers.optimizer.DPOptimizer method)</a>
 </li>
 </ul></li>
-<li><a href="noise_scheduler.html#opacus.scheduler.StepNoise">StepNoise (class in opacus.scheduler)</a>
-</li>
 <li><a href="utils/tensor_utils.html#opacus.utils.tensor_utils.sum_over_all_but_batch_and_last_n">sum_over_all_but_batch_and_last_n() (in module opacus.utils.tensor_utils)</a>
 </li>
 <li><a href="data_loader.html#opacus.data_loader.switch_generator">switch_generator() (in module opacus.data_loader)</a>
@@ -680,7 +667,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

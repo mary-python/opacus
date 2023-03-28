@@ -52,10 +52,10 @@ registered hooks while the latter silently ignores them.</p>
 <dd><p>For all parameters of a given <code class="docutils literal notranslate"><span class="pre">model</span></code> averages gradients over all workers</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>) – model</p>
+<dd class="field-odd"><p><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a>) – model</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -78,7 +78,11 @@ registered hooks while the latter silently ignores them.</p>
 <li class="toctree-l1"><a class="reference internal" href="data_loader.html">DP Data Loader</a></li>
 <li class="toctree-l1"><a class="reference internal" href="accounting/accounting.html">Privacy Accounting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="validator.html">ModuleValidator</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Distributed</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Distributed</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#opacus.distributed.DifferentiallyPrivateDistributedDataParallel"><code class="docutils literal notranslate"><span class="pre">DifferentiallyPrivateDistributedDataParallel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#opacus.distributed.average_gradients"><code class="docutils literal notranslate"><span class="pre">average_gradients()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="noise_scheduler.html">Noise Scheduler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="batch_memory_manager.html">Batch Memory Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">DP Layers</a></li>
@@ -107,7 +111,7 @@ registered hooks while the latter silently ignores them.</p>
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

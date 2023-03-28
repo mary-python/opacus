@@ -41,6 +41,7 @@
 <span class="c1"># limitations under the License.</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -49,7 +50,7 @@
 
 
 <div class="viewcode-block" id="SequenceBias"><a class="viewcode-back" href="../../../dp_multihead_attention.html#opacus.layers.dp_multihead_attention.SequenceBias">[docs]</a><span class="k">class</span> <span class="nc">SequenceBias</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Adds one bias element to the end of the sequence.</span>
 <span class="sd">    so if the input has a shape ``(L, N, E)``, (``batch_first = False``),</span>
 <span class="sd">    where ``L`` is the sequence length, ``N`` is the batch size, and ``E`` is</span>
@@ -70,7 +71,7 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
 <span class="sd">            embed_dim: Embedding dimension</span>
 <span class="sd">        """</span>
@@ -80,7 +81,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_reset_parameters</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        assigns Normally distributed random values to bias.</span>
 <span class="sd">        """</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span>
@@ -95,7 +96,7 @@
 
 
 <div class="viewcode-block" id="DPMultiheadAttention"><a class="viewcode-back" href="../../../dp_multihead_attention.html#opacus.layers.dp_multihead_attention.DPMultiheadAttention">[docs]</a><span class="k">class</span> <span class="nc">DPMultiheadAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    This is DP-friendly implementation of nn.MultiheadAttention.</span>
 <span class="sd">    For full reference see original module refer to</span>
 <span class="sd">    :class:`torch.nn.MultiheadAttention`.</span>
@@ -115,11 +116,14 @@
         <span class="n">add_zero_attn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">kdim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">vdim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DPMultiheadAttention</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">=</span> <span class="n">embed_dim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kdim</span> <span class="o">=</span> <span class="n">kdim</span> <span class="k">if</span> <span class="n">kdim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">embed_dim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vdim</span> <span class="o">=</span> <span class="n">vdim</span> <span class="k">if</span> <span class="n">vdim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">embed_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qkv_same_embed_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kdim</span> <span class="o">==</span> <span class="n">embed_dim</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">vdim</span> <span class="o">==</span> <span class="n">embed_dim</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>
@@ -132,9 +136,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">klinear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kdim</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vlinear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vdim</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">)</span>
 
-        <span class="c1"># torch.nn.MultiHeadAttention out_proj is _LinearWithBias</span>
-        <span class="c1"># explicilty setting bias=True for consistent mimicry</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_bias_kv</span> <span class="o">=</span> <span class="n">add_bias_kv</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_bias_kv</span><span class="p">:</span>
@@ -146,7 +148,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DPMultiheadAttention.load_state_dict"><a class="viewcode-back" href="../../../dp_multihead_attention.html#opacus.layers.dp_multihead_attention.DPMultiheadAttention.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Loads module from previously saved state.</span>
 
 <span class="sd">        Supports loading from both :class:`torch.nn.MultiheadAttention` and</span>
@@ -355,7 +357,93 @@
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">attn_output</span><span class="p">,</span> <span class="n">attn_output_weights</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">attn_output</span><span class="p">,</span> <span class="kc">None</span></div></div>
+            <span class="k">return</span> <span class="n">attn_output</span><span class="p">,</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">unsqueeze_0_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DPMultiheadAttention.state_dict"><a class="viewcode-back" href="../../../dp_multihead_attention.html#opacus.layers.dp_multihead_attention.DPMultiheadAttention.state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">destination</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">destination</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">destination</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="n">local_metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_version</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">"_metadata"</span><span class="p">):</span>
+            <span class="n">destination</span><span class="o">.</span><span class="n">_metadata</span><span class="p">[</span><span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">local_metadata</span>
+
+        <span class="n">destination_alter</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">alter_key</span> <span class="o">=</span> <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">".emb.weight"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alter_key</span> <span class="o">=</span> <span class="s2">"emb.weight"</span>
+        <span class="k">if</span> <span class="n">alter_key</span> <span class="ow">in</span> <span class="n">destination</span><span class="p">:</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">alter_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span><span class="p">[</span><span class="n">alter_key</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_to_state_dict</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span>
+                    <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
+                    <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">"."</span><span class="p">,</span>
+                    <span class="n">keep_vars</span><span class="o">=</span><span class="n">keep_vars</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qkv_same_embed_dim</span><span class="p">:</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"in_proj_weight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"qlinear.weight"</span><span class="p">],</span>
+                    <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"klinear.weight"</span><span class="p">],</span>
+                    <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"vlinear.weight"</span><span class="p">],</span>
+                <span class="p">),</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"q_proj_weight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span><span class="p">[</span>
+                <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"qlinear.weight"</span>
+            <span class="p">]</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"k_proj_weight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span><span class="p">[</span>
+                <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"klinear.weight"</span>
+            <span class="p">]</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"v_proj_weight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span><span class="p">[</span>
+                <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"vlinear.weight"</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"qlinear.bias"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">destination</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"klinear.bias"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">destination</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"vlinear.bias"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">destination</span>
+        <span class="p">):</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"in_proj_bias"</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"qlinear.bias"</span><span class="p">],</span>
+                    <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"klinear.bias"</span><span class="p">],</span>
+                    <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"vlinear.bias"</span><span class="p">],</span>
+                <span class="p">),</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_bias_kv</span><span class="p">:</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"bias_k"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unsqueeze_0_2</span><span class="p">(</span>
+                <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"seq_bias_k.bias"</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"bias_v"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unsqueeze_0_2</span><span class="p">(</span>
+                <span class="n">destination</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"seq_bias_v.bias"</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"out_proj.weight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span><span class="p">[</span>
+            <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"out_proj.weight"</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"out_proj.bias"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">destination</span><span class="p">:</span>
+            <span class="n">destination_alter</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"out_proj.bias"</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination</span><span class="p">[</span>
+                <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"out_proj.bias"</span>
+            <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_dict_hooks</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">hook_result</span> <span class="o">=</span> <span class="n">hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination_alter</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">local_metadata</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hook_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">destination_alter</span> <span class="o">=</span> <span class="n">hook_result</span>
+
+        <span class="k">return</span> <span class="n">destination_alter</span></div></div>
 </pre></div>
 </div>
 </div>
@@ -401,7 +489,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

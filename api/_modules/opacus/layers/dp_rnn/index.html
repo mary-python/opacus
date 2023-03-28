@@ -55,7 +55,7 @@
 
 
 <div class="viewcode-block" id="apply_permutation"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.apply_permutation">[docs]</a><span class="k">def</span> <span class="nf">apply_permutation</span><span class="p">(</span><span class="n">tensor</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">permutation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Permute elements of a tensor along a dimension `dim`. If permutation is None do nothing.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">permutation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -64,7 +64,7 @@
 
 
 <div class="viewcode-block" id="RNNLinear"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.RNNLinear">[docs]</a><span class="k">class</span> <span class="nc">RNNLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">):</span>
-    <span class="sd">"""Applies a linear transformation to the incoming data: :math:`y = xA^T + b`</span>
+<span class="w">    </span><span class="sd">"""Applies a linear transformation to the incoming data: :math:`y = xA^T + b`</span>
 
 <span class="sd">    This module is the same as a ``torch.nn.Linear``` layer, except that in the backward pass</span>
 <span class="sd">    the grad_samples get accumulated (instead of being concatenated as in the standard</span>
@@ -107,7 +107,7 @@
 
 
 <div class="viewcode-block" id="DPRNNCell"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPRNNCell">[docs]</a><span class="k">class</span> <span class="nc">DPRNNCell</span><span class="p">(</span><span class="n">DPRNNCellBase</span><span class="p">):</span>
-    <span class="sd">"""An Elman RNN cell with tanh or ReLU non-linearity.</span>
+<span class="w">    </span><span class="sd">"""An Elman RNN cell with tanh or ReLU non-linearity.</span>
 
 <span class="sd">    DP-friendly drop-in replacement of the ``torch.nn.RNNCell`` module to use in ``DPRNN``.</span>
 <span class="sd">    Refer to ``torch.nn.RNNCell`` documentation for the model description, parameters and inputs/outputs.</span>
@@ -146,7 +146,7 @@
 
 
 <div class="viewcode-block" id="DPGRUCell"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPGRUCell">[docs]</a><span class="k">class</span> <span class="nc">DPGRUCell</span><span class="p">(</span><span class="n">DPRNNCellBase</span><span class="p">):</span>
-    <span class="sd">"""A gated recurrent unit (GRU) cell</span>
+<span class="w">    </span><span class="sd">"""A gated recurrent unit (GRU) cell</span>
 
 <span class="sd">    DP-friendly drop-in replacement of the ``torch.nn.GRUCell`` module to use in ``DPGRU``.</span>
 <span class="sd">    Refer to ``torch.nn.GRUCell`` documentation for the model description, parameters and inputs/outputs.</span>
@@ -183,7 +183,7 @@
 
 
 <div class="viewcode-block" id="DPLSTMCell"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPLSTMCell">[docs]</a><span class="k">class</span> <span class="nc">DPLSTMCell</span><span class="p">(</span><span class="n">DPRNNCellBase</span><span class="p">):</span>
-    <span class="sd">"""A long short-term memory (LSTM) cell.</span>
+<span class="w">    </span><span class="sd">"""A long short-term memory (LSTM) cell.</span>
 
 <span class="sd">    DP-friendly drop-in replacement of the ``torch.nn.LSTMCell`` module to use in ``DPLSTM``.</span>
 <span class="sd">    Refer to ``torch.nn.LSTMCell`` documentation for the model description, parameters and inputs/outputs.</span>
@@ -243,7 +243,7 @@
 
 
 <div class="viewcode-block" id="DPRNNBase"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPRNNBase">[docs]</a><span class="k">class</span> <span class="nc">DPRNNBase</span><span class="p">(</span><span class="n">RenameParamsMixin</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">"""Base class for all RNN-like sequence models.</span>
+<span class="w">    </span><span class="sd">"""Base class for all RNN-like sequence models.</span>
 
 <span class="sd">    DP-friendly drop-in replacement of the ``torch.nn.RNNBase`` module.</span>
 <span class="sd">    After training this module can be exported and loaded by the original ``torch.nn``</span>
@@ -335,7 +335,7 @@
         <span class="nb">input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">PackedSequence</span><span class="p">],</span>
         <span class="n">state_init</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">PackedSequence</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]]:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Forward pass of a full RNN, containing one or many single- or bi-directional layers.</span>
 <span class="sd">        Implemented for an abstract cell type.</span>
 
@@ -490,7 +490,7 @@
         <span class="n">is_packed</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">reverse_layer</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]],</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Forward pass of a single RNN layer (one direction). Implemented for an abstract cell type.</span>
 
 <span class="sd">        Inputs: x, h_0, c_0</span>
@@ -593,7 +593,7 @@
         <span class="k">return</span> <span class="n">h_temp</span><span class="p">,</span> <span class="n">h_last</span><span class="p">,</span> <span class="n">c_last</span></div>
 
 <div class="viewcode-block" id="DPRNNBase.iterate_layers"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPRNNBase.iterate_layers">[docs]</a>    <span class="k">def</span> <span class="nf">iterate_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Iterate through all the layers and through all directions within each layer.</span>
 
 <span class="sd">        Arguments should be list-like of length ``num_layers * num_directions`` where</span>
@@ -659,7 +659,7 @@
 
 
 <div class="viewcode-block" id="DPRNN"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPRNN">[docs]</a><span class="k">class</span> <span class="nc">DPRNN</span><span class="p">(</span><span class="n">DPRNNBase</span><span class="p">):</span>
-    <span class="sd">"""Applies a multi-layer Elman RNN with :math:`\tanh` or :math:`\text{ReLU}` non-linearity to an</span>
+<span class="w">    </span><span class="sd">"""Applies a multi-layer Elman RNN with :math:`\tanh` or :math:`\text{ReLU}` non-linearity to an</span>
 <span class="sd">    input sequence.</span>
 
 <span class="sd">    DP-friendly drop-in replacement of the ``torch.nn.RNN`` module.</span>
@@ -695,7 +695,7 @@
 
 
 <div class="viewcode-block" id="DPGRU"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPGRU">[docs]</a><span class="k">class</span> <span class="nc">DPGRU</span><span class="p">(</span><span class="n">DPRNNBase</span><span class="p">):</span>
-    <span class="sd">"""Applies a multi-layer gated recurrent unit (GRU) RNN to an input sequence.</span>
+<span class="w">    </span><span class="sd">"""Applies a multi-layer gated recurrent unit (GRU) RNN to an input sequence.</span>
 
 <span class="sd">    DP-friendly drop-in replacement of the ``torch.nn.GRU`` module.</span>
 <span class="sd">    Refer to ``torch.nn.GRU`` documentation for the model description, parameters and inputs/outputs.</span>
@@ -728,7 +728,7 @@
 
 
 <div class="viewcode-block" id="DPLSTM"><a class="viewcode-back" href="../../../dp_rnn.html#opacus.layers.dp_rnn.DPLSTM">[docs]</a><span class="k">class</span> <span class="nc">DPLSTM</span><span class="p">(</span><span class="n">DPRNNBase</span><span class="p">):</span>
-    <span class="sd">"""Applies a multi-layer long short-term memory (LSTM) RNN to an input</span>
+<span class="w">    </span><span class="sd">"""Applies a multi-layer long short-term memory (LSTM) RNN to an input</span>
 <span class="sd">    sequence.</span>
 
 <span class="sd">    DP-friendly drop-in replacement of the ``torch.nn.LSTM`` module.</span>
@@ -804,7 +804,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

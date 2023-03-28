@@ -41,6 +41,7 @@
 <span class="c1"># limitations under the License.</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -55,7 +56,7 @@
     <span class="n">wrap_model</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">opacus.optimizers</span> <span class="kn">import</span> <span class="n">DPOptimizer</span><span class="p">,</span> <span class="n">get_optimizer_class</span>
-<span class="kn">from</span> <span class="nn">opacus.scheduler</span> <span class="kn">import</span> <span class="n">_NoiseScheduler</span>
+<span class="kn">from</span> <span class="nn">opacus.schedulers</span> <span class="kn">import</span> <span class="n">_GradClipScheduler</span><span class="p">,</span> <span class="n">_NoiseScheduler</span>
 <span class="kn">from</span> <span class="nn">opacus.utils.module_utils</span> <span class="kn">import</span> <span class="n">trainable_parameters</span>
 <span class="kn">from</span> <span class="nn">opacus.validators.module_validator</span> <span class="kn">import</span> <span class="n">ModuleValidator</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
@@ -68,7 +69,7 @@
     <span class="n">_grad_input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">_grad_output</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Model hook that detects repetitive forward/backward passes between optimizer steps.</span>
 
 <span class="sd">    This is a backward hook that will be wrapped around the whole model using</span>
@@ -109,7 +110,7 @@
 
 
 <div class="viewcode-block" id="PrivacyEngine"><a class="viewcode-back" href="../../privacy_engine.html#opacus.privacy_engine.PrivacyEngine">[docs]</a><span class="k">class</span> <span class="nc">PrivacyEngine</span><span class="p">:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Main entry point to the Opacus API - use ``PrivacyEngine``  to enable differential</span>
 <span class="sd">    privacy for your model training.</span>
 
@@ -133,13 +134,14 @@
 <span class="sd">        &gt;&gt;&gt; # continue training as normal</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">accountant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"rdp"</span><span class="p">,</span> <span class="n">secure_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">accountant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"prv"</span><span class="p">,</span> <span class="n">secure_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            accountant: Accounting mechanism. Currently supported:</span>
 <span class="sd">                - rdp (:class:`~opacus.accountants.RDPAccountant`)</span>
 <span class="sd">                - gdp (:class:`~opacus.accountants.GaussianAccountant`)</span>
+<span class="sd">                - prv (:class`~opacus.accountants.PRVAccountant`)</span>
 <span class="sd">            secure_mode: Set to ``True`` if cryptographically strong DP guarantee is</span>
 <span class="sd">                required. ``secure_mode=True`` uses secure random number generator for</span>
 <span class="sd">                noise and shuffling (as opposed to pseudo-rng in vanilla PyTorch) and</span>
@@ -278,7 +280,7 @@
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">],</span>
         <span class="n">data_loader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if task components are compatible with DP.</span>
 
 <span class="sd">        Args:</span>
@@ -298,7 +300,7 @@
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">],</span>
         <span class="n">data_loader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
     <span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Validate that task components are compatible with DP.</span>
 <span class="sd">        Same as ``is_compatible()``, but raises error instead of returning bool.</span>
 
@@ -315,7 +317,7 @@
 
 <div class="viewcode-block" id="PrivacyEngine.get_compatible_module"><a class="viewcode-back" href="../../privacy_engine.html#opacus.privacy_engine.PrivacyEngine.get_compatible_module">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_compatible_module</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return a privacy engine compatible module. Also validates the module after</span>
 <span class="sd">        running registered fixes.</span>
 
@@ -347,8 +349,8 @@
         <span class="n">noise_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">grad_sample_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"hooks"</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GradSampleModule</span><span class="p">,</span> <span class="n">DPOptimizer</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">]:</span>
-        <span class="sd">"""</span>
-<span class="sd">        Add privacy-related responsibilites to the main PyTorch training objects:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add privacy-related responsibilities to the main PyTorch training objects:</span>
 <span class="sd">        model, optimizer, and the data loader.</span>
 
 <span class="sd">        All of the returned objects act just like their non-private counterparts</span>
@@ -410,19 +412,14 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Passing seed is prohibited in secure mode"</span><span class="p">)</span>
 
         <span class="c1"># compare module parameter with optimizer parameters</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                <span class="nb">list</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span>
-                <span class="nb">sum</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">param_group</span><span class="p">[</span><span class="s2">"params"</span><span class="p">]</span> <span class="k">for</span> <span class="n">param_group</span> <span class="ow">in</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">],</span>
-                    <span class="p">[],</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
+        <span class="n">model_parameters</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">param_group</span><span class="p">[</span><span class="s2">"params"</span><span class="p">]</span> <span class="k">for</span> <span class="n">param_group</span> <span class="ow">in</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">]</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"Module parameters are different than optimizer Parameters"</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_parameters</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"Module parameters are different than optimizer Parameters"</span>
+                <span class="p">)</span>
 
         <span class="n">distributed</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="p">(</span><span class="n">DPDDP</span><span class="p">,</span> <span class="n">DDP</span><span class="p">))</span>
 
@@ -474,14 +471,16 @@
         <span class="n">target_epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">target_delta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">max_grad_norm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">max_grad_norm</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
         <span class="n">batch_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">loss_reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"mean"</span><span class="p">,</span>
+        <span class="n">poisson_sampling</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">clipping</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"flat"</span><span class="p">,</span>
         <span class="n">noise_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">grad_sample_mode</span><span class="o">=</span><span class="s2">"hooks"</span><span class="p">,</span>
+        <span class="n">grad_sample_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"hooks"</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Version of :meth:`~opacus.privacy_engine.PrivacyEngine.make_private`,</span>
 <span class="sd">        that calculates privacy parameters based on a given privacy budget.</span>
 
@@ -492,9 +491,6 @@
 <span class="sd">            module: PyTorch module to be used for training</span>
 <span class="sd">            optimizer: Optimizer to be used for training</span>
 <span class="sd">            data_loader: DataLoader to be used for training</span>
-<span class="sd">            noise_multiplier: The ratio of the standard deviation of the Gaussian noise to</span>
-<span class="sd">                the L2-sensitivity of the function to which the noise is added</span>
-<span class="sd">                (How much noise to add)</span>
 <span class="sd">            max_grad_norm: The maximum norm of the per-sample gradients. Any gradient with norm</span>
 <span class="sd">                higher than this will be clipped to this value.</span>
 <span class="sd">            batch_first: Flag to indicate if the input tensor to the corresponding module</span>
@@ -503,18 +499,23 @@
 <span class="sd">                ``[K, batch_size, ...]``</span>
 <span class="sd">            loss_reduction: Indicates if the loss reduction (for aggregating the gradients)</span>
 <span class="sd">                is a sum or a mean operation. Can take values "sum" or "mean"</span>
-<span class="sd">            noise_seed: Seed to be used for random noise generation</span>
 <span class="sd">            poisson_sampling: ``True`` if you want to use standard sampling required</span>
 <span class="sd">                for DP guarantees. Setting ``False`` will leave provided data_loader</span>
 <span class="sd">                unchanged. Technically this doesn't fit the assumptions made by</span>
 <span class="sd">                privacy accounting mechanism, but it can be a good approximation when</span>
 <span class="sd">                using Poisson sampling is unfeasible.</span>
-<span class="sd">            clipping: Per sample gradient clipping mechanism ("flat" or "per_layer").</span>
+<span class="sd">            clipping: Per sample gradient clipping mechanism ("flat" or "per_layer" or "adaptive").</span>
 <span class="sd">                Flat clipping calculates the norm of the entire gradient over</span>
 <span class="sd">                all parameters, per layer clipping sets individual norms for</span>
 <span class="sd">                every parameter tensor, and adaptive clipping updates clipping bound per iteration.</span>
 <span class="sd">                Flat clipping is usually preferred, but using per layer clipping in combination</span>
 <span class="sd">                with distributed training can provide notable performance gains.</span>
+<span class="sd">            noise_generator: torch.Generator() object used as a source of randomness for</span>
+<span class="sd">                the noise</span>
+<span class="sd">            grad_sample_mode: mode for computing per sample gradients. Determines the</span>
+<span class="sd">                implementation class for the wrapped ``module``. See</span>
+<span class="sd">                :class:`~opacus.grad_sample.gsm_base.AbstractGradSampleModule` for more</span>
+<span class="sd">                details</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple of (model, optimizer, data_loader).</span>
@@ -522,7 +523,7 @@
 <span class="sd">            Model is a wrapper around the original model that also computes per sample</span>
 <span class="sd">                gradients</span>
 <span class="sd">            Optimizer is a wrapper around the original optimizer that also does</span>
-<span class="sd">             gradient clipping and adding noise to the gradients</span>
+<span class="sd">                gradient clipping and noise addition to the gradients</span>
 <span class="sd">            DataLoader is a brand new DataLoader object, constructed to behave as</span>
 <span class="sd">                equivalent to the original data loader, possibly with updated</span>
 <span class="sd">                sampling mechanism. Points to the same dataset object.</span>
@@ -553,10 +554,12 @@
             <span class="n">loss_reduction</span><span class="o">=</span><span class="n">loss_reduction</span><span class="p">,</span>
             <span class="n">noise_generator</span><span class="o">=</span><span class="n">noise_generator</span><span class="p">,</span>
             <span class="n">grad_sample_mode</span><span class="o">=</span><span class="n">grad_sample_mode</span><span class="p">,</span>
+            <span class="n">poisson_sampling</span><span class="o">=</span><span class="n">poisson_sampling</span><span class="p">,</span>
+            <span class="n">clipping</span><span class="o">=</span><span class="n">clipping</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PrivacyEngine.get_epsilon"><a class="viewcode-back" href="../../privacy_engine.html#opacus.privacy_engine.PrivacyEngine.get_epsilon">[docs]</a>    <span class="k">def</span> <span class="nf">get_epsilon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Computes the (epsilon, delta) privacy budget spent so far.</span>
 
 <span class="sd">        Args:</span>
@@ -574,16 +577,20 @@
         <span class="n">module</span><span class="p">:</span> <span class="n">GradSampleModule</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DPOptimizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">noise_scheduler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_NoiseScheduler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">grad_clip_scheduler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_GradClipScheduler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">checkpoint_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">module_state_dict_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">torch_save_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">"""</span>
-<span class="sd">        Saves the state_dict of module, optimzer, and accountant at path.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Saves the state_dict of module, optimizer, and accountant at path.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            path: Path to save the state dict objects.</span>
 <span class="sd">            module: GradSampleModule to save; wrapped module's state_dict is saved.</span>
 <span class="sd">            optimizer: DPOptimizer to save; wrapped optimizer's state_dict is saved.</span>
+<span class="sd">            noise_scheduler: _NoiseScheduler whose state we should save.</span>
+<span class="sd">            grad_clip_scheduler: _GradClipScheduler whose state we should save.</span>
+<span class="sd">            checkpoint_dict: Dict[str, Any]; an already-filled checkpoint dict.</span>
 <span class="sd">            module_state_dict_kwargs: dict of kwargs to pass to ``module.state_dict()``</span>
 <span class="sd">            torch_save_kwargs: dict of kwargs to pass to ``torch.save()``</span>
 
@@ -597,6 +604,10 @@
             <span class="n">checkpoint_dict</span><span class="p">[</span><span class="s2">"optimizer_state_dict"</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">noise_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">checkpoint_dict</span><span class="p">[</span><span class="s2">"noise_scheduler_state_dict"</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">grad_clip_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">checkpoint_dict</span><span class="p">[</span>
+                <span class="s2">"grad_clip_scheduler_state_dict"</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">grad_clip_scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
 
         <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">checkpoint_dict</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">torch_save_kwargs</span> <span class="ow">or</span> <span class="p">{}))</span></div>
 
@@ -607,6 +618,7 @@
         <span class="n">module</span><span class="p">:</span> <span class="n">GradSampleModule</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DPOptimizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">noise_scheduler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_NoiseScheduler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">grad_clip_scheduler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_GradClipScheduler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">module_load_dict_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">torch_load_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
@@ -623,12 +635,18 @@
             <span class="c1"># warn if only one of them is available</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">"optimizer_state_dict has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">optimizer_state_dict</span><span class="p">)</span><span class="si">}</span><span class="s2"> items"</span>
-                <span class="sa">f</span><span class="s2">" but optimizer is </span><span class="si">{</span><span class="s1">''</span> <span class="k">if</span> <span class="n">optimizer</span> <span class="k">else</span> <span class="s1">'not'</span><span class="si">}</span><span class="s2"> provided."</span>
+                <span class="sa">f</span><span class="s2">" but optimizer is </span><span class="si">{</span><span class="s1">''</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">optimizer</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'not'</span><span class="si">}</span><span class="s2"> provided."</span>
             <span class="p">)</span>
 
         <span class="n">noise_scheduler_state_dict</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"noise_scheduler_state_dict"</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="n">noise_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">noise_scheduler_state_dict</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">noise_scheduler</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">noise_scheduler_state_dict</span><span class="p">)</span>
+
+        <span class="n">grad_clip_scheduler_state_dict</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="s2">"grad_clip_scheduler_state_dict"</span><span class="p">,</span> <span class="p">{}</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">grad_clip_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">grad_clip_scheduler_state_dict</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">grad_clip_scheduler</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">grad_clip_scheduler_state_dict</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">checkpoint</span></div>
 </pre></div>
@@ -676,7 +694,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

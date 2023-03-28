@@ -45,7 +45,8 @@ Refer to <code class="docutils literal notranslate"><span class="pre">torch.nn.G
 <dt class="sig sig-object py" id="opacus.layers.dp_rnn.DPGRUCell.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opacus/layers/dp_rnn.html#DPGRUCell.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opacus.layers.dp_rnn.DPGRUCell.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
+<p>Should be overridden by all subclasses.
+:rtype: <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Although the recipe for forward pass needs to be defined within
@@ -53,11 +54,6 @@ this function, one should call the <code class="xref py py-class docutils litera
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a></p>
-</dd>
-</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -80,7 +76,8 @@ Refer to <code class="docutils literal notranslate"><span class="pre">torch.nn.L
 <dt class="sig sig-object py" id="opacus.layers.dp_rnn.DPLSTMCell.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opacus/layers/dp_rnn.html#DPLSTMCell.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opacus.layers.dp_rnn.DPLSTMCell.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
+<p>Should be overridden by all subclasses.
+:rtype: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Although the recipe for forward pass needs to be defined within
@@ -88,11 +85,6 @@ this function, one should call the <code class="xref py py-class docutils litera
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]</p>
-</dd>
-</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -125,6 +117,11 @@ Cell should be a subclass of <code class="docutils literal notranslate"><span cl
 Implemented for an abstract cell type.</p>
 <p>Note: <code class="docutils literal notranslate"><span class="pre">proj_size</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> is not supported here.
 Cell state size is always equal to hidden state size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.utils.rnn.PackedSequence.html#torch.nn.utils.rnn.PackedSequence" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackedSequence</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]]]</p>
+</dd>
+</dl>
 <dl>
 <dt>Inputs: input, h_0/(h_0, c_0)</dt><dd><dl class="simple">
 <dt>input: Input sequence. Tensor of shape <code class="docutils literal notranslate"><span class="pre">[T,</span> <span class="pre">B,</span> <span class="pre">D]</span></code> (<code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">D]</span></code> if <code class="docutils literal notranslate"><span class="pre">batch_first=True</span></code>)</dt><dd><p>or PackedSequence.</p>
@@ -149,11 +146,6 @@ D = input_size
 H = hidden_size
 L = num_layers
 P = num_directions (2 if <cite>bidirectional=True</cite> else 1)</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.utils.rnn.PackedSequence.html#torch.nn.utils.rnn.PackedSequence" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PackedSequence</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -185,16 +177,16 @@ H = hidden_size (output size, for this specific layer)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>batch_sizes</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>) – Contains the batch sizes as stored in PackedSequence</p></li>
+<li><p><strong>batch_sizes</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>) – Contains the batch sizes as stored in PackedSequence</p></li>
 <li><p><strong>cell</strong> (<a class="reference internal" href="#opacus.layers.dp_rnn.DPRNNCellBase" title="opacus.layers.dp_rnn.DPRNNCellBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DPRNNCellBase</span></code></a>) – Module implementing a single cell of the network, must be an instance of DPRNNCell</p></li>
-<li><p><strong>max_batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – batch size</p></li>
-<li><p><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – sequence length</p></li>
-<li><p><strong>is_packed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – whether PackedSequence is used as input</p></li>
-<li><p><strong>reverse_layer</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if True, it will run forward pass for a reversed layer</p></li>
+<li><p><strong>max_batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – batch size</p></li>
+<li><p><strong>seq_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – sequence length</p></li>
+<li><p><strong>is_packed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – whether PackedSequence is used as input</p></li>
+<li><p><strong>reverse_layer</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if True, it will run forward pass for a reversed layer</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]], <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]], <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -234,7 +226,8 @@ Refer to <code class="docutils literal notranslate"><span class="pre">torch.nn.R
 <dt class="sig sig-object py" id="opacus.layers.dp_rnn.DPRNNCell.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/opacus/layers/dp_rnn.html#DPRNNCell.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#opacus.layers.dp_rnn.DPRNNCell.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
+<p>Should be overridden by all subclasses.
+:rtype: <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Although the recipe for forward pass needs to be defined within
@@ -242,11 +235,6 @@ this function, one should call the <code class="xref py py-class docutils litera
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a></p>
-</dd>
-</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -321,7 +309,7 @@ the size of per-sample grad tensor.</p>
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

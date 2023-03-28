@@ -43,6 +43,7 @@
 <span class="sd">"""</span>
 <span class="sd">Utils for generating stats from torch tensors.</span>
 <span class="sd">"""</span>
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -53,11 +54,11 @@
 <div class="viewcode-block" id="calc_sample_norms"><a class="viewcode-back" href="../../../utils/tensor_utils.html#opacus.utils.tensor_utils.calc_sample_norms">[docs]</a><span class="k">def</span> <span class="nf">calc_sample_norms</span><span class="p">(</span>
     <span class="n">named_params</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span> <span class="o">*</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Calculates the norm of the given tensors for each sample.</span>
 
 <span class="sd">    This function calculates the overall norm of the given tensors for each sample,</span>
-<span class="sd">    assuming the each batch's dim is zero.</span>
+<span class="sd">    assuming each batch's dim is zero.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        named_params: An iterator of tuples &lt;name, param&gt; with name being a</span>
@@ -84,11 +85,11 @@
 
 
 <div class="viewcode-block" id="calc_sample_norms_one_layer"><a class="viewcode-back" href="../../../utils/tensor_utils.html#opacus.utils.tensor_utils.calc_sample_norms_one_layer">[docs]</a><span class="k">def</span> <span class="nf">calc_sample_norms_one_layer</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Calculates the norm of the given tensor (a single parameter) for each sample.</span>
 
 <span class="sd">    This function calculates the overall norm of the given tensor for each sample,</span>
-<span class="sd">    assuming the each batch's dim is zero.</span>
+<span class="sd">    assuming each batch's dim is zero.</span>
 
 <span class="sd">    It is equivalent to:</span>
 <span class="sd">    `calc_sample_norms(named_params=((None, param),))[0]`</span>
@@ -113,11 +114,11 @@
 <div class="viewcode-block" id="sum_over_all_but_batch_and_last_n"><a class="viewcode-back" href="../../../utils/tensor_utils.html#opacus.utils.tensor_utils.sum_over_all_but_batch_and_last_n">[docs]</a><span class="k">def</span> <span class="nf">sum_over_all_but_batch_and_last_n</span><span class="p">(</span>
     <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">n_dims</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Calculates the sum over all dimensions, except the first</span>
 <span class="sd">    (batch dimension), and excluding the last n_dims.</span>
 
-<span class="sd">    This function will ignore the first dimension and it will</span>
+<span class="sd">    This function will ignore the first dimension, and it will</span>
 <span class="sd">    not aggregate over the last n_dims dimensions.</span>
 
 <span class="sd">    Args:</span>
@@ -143,22 +144,46 @@
     <span class="nb">input</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">kernel_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-    <span class="n">padding</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">padding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
     <span class="n">stride</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">dilation</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    See :meth:`~torch.nn.functional.unfold`</span>
 <span class="sd">    """</span>
     <span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">padding</span> <span class="o">==</span> <span class="s2">"same"</span><span class="p">:</span>
+        <span class="n">total_pad_H</span> <span class="o">=</span> <span class="n">dilation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">total_pad_W</span> <span class="o">=</span> <span class="n">dilation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pad_H_left</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">total_pad_H</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">pad_H_right</span> <span class="o">=</span> <span class="n">total_pad_H</span> <span class="o">-</span> <span class="n">pad_H_left</span>
+        <span class="n">pad_W_left</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">total_pad_W</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">pad_W_right</span> <span class="o">=</span> <span class="n">total_pad_W</span> <span class="o">-</span> <span class="n">pad_W_left</span>
+
+    <span class="k">elif</span> <span class="n">padding</span> <span class="o">==</span> <span class="s2">"valid"</span><span class="p">:</span>
+        <span class="n">pad_W_left</span><span class="p">,</span> <span class="n">pad_W_right</span><span class="p">,</span> <span class="n">pad_H_left</span><span class="p">,</span> <span class="n">pad_H_right</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pad_H_left</span><span class="p">,</span> <span class="n">pad_H_right</span><span class="p">,</span> <span class="n">pad_W_left</span><span class="p">,</span> <span class="n">pad_W_right</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+
     <span class="n">H_effective</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">H</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dilation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">H</span>
+        <span class="o">+</span> <span class="n">pad_H_left</span>
+        <span class="o">+</span> <span class="n">pad_H_right</span>
+        <span class="o">-</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dilation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
     <span class="p">)</span> <span class="o">//</span> <span class="n">stride</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">W_effective</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">W</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dilation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">W</span>
+        <span class="o">+</span> <span class="n">pad_W_left</span>
+        <span class="o">+</span> <span class="n">pad_W_right</span>
+        <span class="o">+</span> <span class="o">-</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dilation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
     <span class="p">)</span> <span class="o">//</span> <span class="n">stride</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="c1"># F.pad's first argument is the padding of the *last* dimension</span>
-    <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="p">(</span><span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="p">(</span><span class="n">pad_W_left</span><span class="p">,</span> <span class="n">pad_W_right</span><span class="p">,</span> <span class="n">pad_H_left</span><span class="p">,</span> <span class="n">pad_H_right</span><span class="p">))</span>
     <span class="o">*</span><span class="n">shape_pad</span><span class="p">,</span> <span class="n">H_pad</span><span class="p">,</span> <span class="n">W_pad</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">strides</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span>
     <span class="n">strides</span> <span class="o">=</span> <span class="n">strides</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
@@ -182,7 +207,7 @@
     <span class="n">stride</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">dilation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Extracts sliding local blocks from an batched input tensor.</span>
 
 <span class="sd">    :class:`torch.nn.Unfold` only supports 4D inputs (batched image-like tensors).</span>
@@ -223,13 +248,44 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dilation</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">dilation</span> <span class="o">=</span> <span class="p">(</span><span class="n">dilation</span><span class="p">,</span> <span class="n">dilation</span><span class="p">,</span> <span class="n">dilation</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">padding</span> <span class="o">==</span> <span class="s2">"same"</span><span class="p">:</span>
+        <span class="n">total_pad_D</span> <span class="o">=</span> <span class="n">dilation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">total_pad_H</span> <span class="o">=</span> <span class="n">dilation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">total_pad_W</span> <span class="o">=</span> <span class="n">dilation</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pad_D_left</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">total_pad_D</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">pad_D_right</span> <span class="o">=</span> <span class="n">total_pad_D</span> <span class="o">-</span> <span class="n">pad_D_left</span>
+        <span class="n">pad_H_left</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">total_pad_H</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">pad_H_right</span> <span class="o">=</span> <span class="n">total_pad_H</span> <span class="o">-</span> <span class="n">pad_H_left</span>
+        <span class="n">pad_W_left</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">total_pad_W</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">pad_W_right</span> <span class="o">=</span> <span class="n">total_pad_W</span> <span class="o">-</span> <span class="n">pad_W_left</span>
+
+    <span class="k">elif</span> <span class="n">padding</span> <span class="o">==</span> <span class="s2">"valid"</span><span class="p">:</span>
+        <span class="n">pad_D_left</span><span class="p">,</span> <span class="n">pad_D_right</span><span class="p">,</span> <span class="n">pad_W_left</span><span class="p">,</span> <span class="n">pad_W_right</span><span class="p">,</span> <span class="n">pad_H_left</span><span class="p">,</span> <span class="n">pad_H_right</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pad_D_left</span><span class="p">,</span> <span class="n">pad_D_right</span><span class="p">,</span> <span class="n">pad_H_left</span><span class="p">,</span> <span class="n">pad_H_right</span><span class="p">,</span> <span class="n">pad_W_left</span><span class="p">,</span> <span class="n">pad_W_right</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">padding</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="p">)</span>
+
     <span class="n">batch_size</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="c1"># Input shape: (B, C, D, H, W)</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
-        <span class="n">tensor</span><span class="p">,</span> <span class="p">(</span><span class="n">padding</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">padding</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">tensor</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">pad_W_left</span><span class="p">,</span> <span class="n">pad_W_right</span><span class="p">,</span> <span class="n">pad_H_left</span><span class="p">,</span> <span class="n">pad_H_right</span><span class="p">,</span> <span class="n">pad_D_left</span><span class="p">,</span> <span class="n">pad_D_right</span><span class="p">),</span>
     <span class="p">)</span>
-    <span class="c1"># Output shape: (B, C, D+2*padding[2], H+2*padding[1], W+2*padding[0])</span>
+    <span class="c1"># Output shape: (B, C, D+pad_W_left+pad_W_right, H+pad_H_left+pad_H_right, W+pad_D_left+pad_D_right)</span>
 
     <span class="n">dilated_kernel_size</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">kernel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dilation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
@@ -264,7 +320,7 @@
     <span class="n">dilated_kernel_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">kernel_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A helper function that removes extra rows created during the process of</span>
 <span class="sd">    implementing dilation.</span>
 
@@ -349,7 +405,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

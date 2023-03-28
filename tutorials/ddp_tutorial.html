@@ -76,59 +76,59 @@
   src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js">
 </script>
 <div class="notebook">
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=089e364e"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Training-with-Opacus-on-multiple-GPUs-with-Distributed-Data-Parallel">Training with Opacus on multiple GPUs with Distributed Data Parallel<a class="anchor-link" href="#Training-with-Opacus-on-multiple-GPUs-with-Distributed-Data-Parallel">¶</a></h1>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=afda23db"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In this tutorial we'll go over the basics you need to know to start using Opacus in your distributed model training pipeline. As the state-of-the-art models and datasets get bigger, multi-GPU training became the norm and Opacus comes with seamless, out-of-the box support for Distributed Data Parallel (DDP).</p>
-<p>This tutorial requires basic knowledge of Opacus and DDP. If you're new to either of these tools, we suggest to start with the following tutorials: <a href="https://opacus.ai/tutorials/building_image_classifier">Building an Image Classifier with Differential Privacy</a> and <a href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></p>
-<p>In Chapter 1 we'll start with a mininmal working example to demonstrate what exactly do you need to do in order to make Opacus work in a distributed setting. This should be enough to get started for most common scenarios.</p>
+<p>In this tutorial we'll go over the basics you need to know to start using Opacus in your distributed model training pipeline. As the state-of-the-art models and datasets get bigger, multi-GPU training became the norm and Opacus comes with seamless, out-of-the-box support for Distributed Data Parallel (DDP).</p>
+<p>This tutorial requires basic knowledge of Opacus and DDP. If you're new to either of these tools, we suggest starting with the following tutorials: <a href="https://opacus.ai/tutorials/building_image_classifier">Building an Image Classifier with Differential Privacy</a> and <a href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></p>
+<p>In Chapter 1 we'll start with a minimal working example to demonstrate what exactly you need to do in order to make Opacus work in a distributed setting. This should be enough to get started for most common scenarios.</p>
 <p>In Chapters 2 and 3 we'll take a closer look at the implementation and talk about technical details. We'll see what are the differences between private DDP and regular DDP and why we need to introduce them.</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=e04831f6"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Chapter-0:-Preparations">Chapter 0: Preparations<a class="anchor-link" href="#Chapter-0:-Preparations">¶</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=1089c8c1"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Before we begin, there are a few things we need to mention.</p>
 <p>First, this tutorial is written to be executed on a single Linux machine with at least 2 GPUs. The general principles remain the same for Windows environment and/or multi-node training, but you'll need to slightly modify the DDP code to make it work.</p>
-<p>Second, Jupyter notebooks are <a href="https://discuss.pytorch.org/t/distributeddataparallel-on-terminal-vs-jupyter-notebook/101404">known</a> not to support DDP training. Throughout the tutorial we'll use <code>%%writefile</code> magic command to write code to a separate file and later execute it via the terminal. These files will be cleaned up in the last cell of this notebook.</p>
+<p>Second, Jupyter notebooks are <a href="https://discuss.pytorch.org/t/distributeddataparallel-on-terminal-vs-jupyter-notebook/101404">known</a> not to support DDP training. Throughout the tutorial, we'll use <code>%%writefile</code> magic command to write code to a separate file and later execute it via the terminal. These files will be cleaned up in the last cell of this notebook.</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=a702f3d6"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Chapter-1:-Getting-Started">Chapter 1: Getting Started<a class="anchor-link" href="#Chapter-1:-Getting-Started">¶</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=3a9a2af5"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>First, let's initialise distributed environment</p>
+<p>First, let's initialise the distributed environment</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=7189b698">
 <div class="input">
 <div class="prompt input_prompt">In [1]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> opacus_ddp_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="n">opacus_ddp_demo</span><span class="o">.</span><span class="n">py</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -161,19 +161,19 @@
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=36d6ebef"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We'll be using MNIST for a toy example, so let's also initialize simple convolutional network and download the dataset</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=336d6560">
 <div class="input">
 <div class="prompt input_prompt">In [2]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_ddp_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_ddp_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
@@ -212,12 +212,12 @@
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=254db444">
 <div class="input">
 <div class="prompt input_prompt">In [3]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_ddp_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_ddp_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
 
@@ -266,27 +266,27 @@
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=3b754537"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Coming next is the key bit - and the only one that's different from non-private DDP.</p>
 <p>First, instead of wrapping the model with <code>DistributedDataParallel</code> we'll wrap it with <code>DifferentiallyPrivateDistributedDataParallel</code> from <code>opacus.distributed</code> package. Simple as that.</p>
-<p>Second difference comes when itinializing the <code>DataLoader</code>. Normally, for ditributed training you would initialize data loader specific to your distributed setup. It affects two parameters:</p>
+<p>Second difference comes when initializing the <code>DataLoader</code>. Normally, for distributed training you would initialize data loader specific to your distributed setup. It affects two parameters:</p>
 <ul>
 <li>Batch size denotes the per-GPU batch size. That is, your logical batch size (one that matters for convergence) is equal to <code>local_batch_size*num_gpus</code>.</li>
 <li>You need to specify <code>sampler=DistributedSampler(dataset)</code> to distribute the training dataset across GPUs.</li>
 </ul>
-<p>With Opacus you don't need to do either of those things. <code>make_private</code> method expects user-provided <code>DataLoader</code> to be non-distributed, initalized as if you're training on a single GPU.</p>
+<p>With Opacus you don't need to do either of those things. <code>make_private</code> method expects user-provided <code>DataLoader</code> to be non-distributed, initialized as if you're training on a single GPU.</p>
 <p>The code below highlights changes you need to make to a normal DDP training pipeline by commenting out lines you need to replace or remove.</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=4af4f1d0">
 <div class="input">
 <div class="prompt input_prompt">In [4]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_ddp_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_ddp_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
@@ -359,19 +359,19 @@
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=baae0bb5"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we just need to define the training loop and launch it.</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=26c24fc7">
 <div class="input">
 <div class="prompt input_prompt">In [5]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_ddp_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_ddp_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -453,12 +453,12 @@
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=03256ef1">
 <div class="input">
 <div class="prompt input_prompt">In [6]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_ddp_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_ddp_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 
@@ -488,7 +488,7 @@
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=e8703467"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And, finally, running the script. Notice, that we've initialized our <code>DataLoader</code> with <code>batch_size=200</code>, which is equivalent to 300 batches on the full dataset (60000 images).</p>
@@ -496,12 +496,12 @@
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=48c97af5">
 <div class="input">
 <div class="prompt input_prompt">In [7]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>python -W ignore opacus_ddp_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="err">!</span><span class="n">python</span> <span class="o">-</span><span class="n">W</span> <span class="n">ignore</span> <span class="n">opacus_ddp_demo</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 </div>
@@ -531,14 +531,14 @@ Epoch: 9 	Train Loss: 0.4129 | Train Accuracy: 0.92 | Test Accuracy: 0.93 |(ε =
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=a2844d05"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Chapter-2:-Data-and-distributed-sampler">Chapter 2: Data and distributed sampler<a class="anchor-link" href="#Chapter-2:-Data-and-distributed-sampler">¶</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=c86099a0"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Note</strong>: The following two chapters discuss the advanced usage of Opacus and its implementation details. We strongly recommend to read the tutorial on <a href="https://opacus.ai/tutorials/intro_to_advanced_features">Advanced Features of Opacus</a> before proceeding.</p>
@@ -547,7 +547,7 @@ Epoch: 9 	Train Loss: 0.4129 | Train Accuracy: 0.92 | Test Accuracy: 0.93 |(ε =
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=5ef85e84"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's now initialize the regular data loader and then transform it to the <code>DPDataLoader</code>. This is exactly how we do it in the <code>make_private()</code> method.</p>
@@ -561,12 +561,12 @@ Epoch: 9 	Train Loss: 0.4129 | Train Accuracy: 0.92 | Test Accuracy: 0.93 |(ε =
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=ea3bc937">
 <div class="input">
 <div class="prompt input_prompt">In [8]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> opacus_distributed_data_loader_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="n">opacus_distributed_data_loader_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">from</span> <span class="nn">opacus_ddp_demo</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">cleanup</span><span class="p">,</span> <span class="n">mnist_train_ds</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -632,12 +632,12 @@ Epoch: 9 	Train Loss: 0.4129 | Train Accuracy: 0.92 | Test Accuracy: 0.93 |(ε =
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=3dba7efa">
 <div class="input">
 <div class="prompt input_prompt">In [9]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_distributed_data_loader_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_distributed_data_loader_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
@@ -667,7 +667,7 @@ Epoch: 9 	Train Loss: 0.4129 | Train Accuracy: 0.92 | Test Accuracy: 0.93 |(ε =
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=98adeb98"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's see what happens when we run it - and what exactly does <code>from_data_loader</code> factory did.</p>
@@ -675,12 +675,12 @@ Epoch: 9 	Train Loss: 0.4129 | Train Accuracy: 0.92 | Test Accuracy: 0.93 |(ε =
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=99ef680c">
 <div class="input">
 <div class="prompt input_prompt">In [10]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>python -W ignore opacus_distributed_data_loader_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="err">!</span><span class="n">python</span> <span class="o">-</span><span class="n">W</span> <span class="n">ignore</span> <span class="n">opacus_distributed_data_loader_demo</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 </div>
@@ -699,29 +699,29 @@ Epoch: 9 	Train Loss: 0.4129 | Train Accuracy: 0.92 | Test Accuracy: 0.93 |(ε =
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=d938f572"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Chapter-3:-Synchronisation">Chapter 3: Synchronisation<a class="anchor-link" href="#Chapter-3:-Synchronisation">¶</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=491a3ed8"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>One significant difference between <code>DDP</code> and <code>DPDDP</code> is how it approaches synchronisation.</p>
 <p>Normally with Distributed Data Parallel forward and backward passes are synchronisation points, and <code>DDP</code> wrapper ensures that the gradients are synchronised across workers at the end of the backward pass.</p>
-<p>Opacus, however, need a later synchronisation point. Before we can use the gradients, we need to clip them add noise. This is done in the optimizer, which moves the synchronisation point from the backward pass to the optimization step.
+<p>Opacus, however, need a later synchronisation point. Before we can use the gradients, we need to clip them and add noise. This is done in the optimizer, which moves the synchronisation point from the backward pass to the optimization step.
 Additionally, to simplify the calculations, we only add noise on worker with <code>rank=0</code>, and use the noise scale calibrated to the combined batch across all workers.</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=9821ce76">
 <div class="input">
 <div class="prompt input_prompt">In [11]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> opacus_sync_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="n">opacus_sync_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'/data/home/shilov/opacus'</span><span class="p">)</span>
@@ -782,7 +782,7 @@ Additionally, to simplify the calculations, we only add noise on worker with <co
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=a1e810cc"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we've initialized <code>DifferentiallyPrivateDistributedDataParallel</code> model and <code>DistributedDPOptimizer</code> let's see how they work together.</p>
@@ -796,12 +796,12 @@ Additionally, to simplify the calculations, we only add noise on worker with <co
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=fa600d2f">
 <div class="input">
 <div class="prompt input_prompt">In [12]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_sync_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_sync_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -862,12 +862,12 @@ Additionally, to simplify the calculations, we only add noise on worker with <co
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=d249d0d5">
 <div class="input">
 <div class="prompt input_prompt">In [13]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%writefile</span> -a opacus_sync_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="o">-</span><span class="n">a</span> <span class="n">opacus_sync_demo</span><span class="o">.</span><span class="n">py</span>
 
 <span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -897,19 +897,19 @@ Additionally, to simplify the calculations, we only add noise on worker with <co
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=a9c95972"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>When we run the code, notice that the gradients are not synchronised after <code>loss.backward()</code>, but only after <code>optimizer.step()</code>. For this example we've set privacy parameters to effectively disable noise and clipping, so the synchronised gradient is indeed the average between individual worker's gradients.</p>
+<p>When we run the code, notice that the gradients are not synchronised after <code>loss.backward()</code>, but only after <code>optimizer.step()</code>. For this example, we've set privacy parameters to effectively disable noise and clipping, so the synchronised gradient is indeed the average between individual worker's gradients.</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=c4a8967c">
 <div class="input">
 <div class="prompt input_prompt">In [14]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>python -W ignore opacus_sync_demo.py
+<div class="highlight hl-ipython3"><pre><span></span><span class="err">!</span><span class="n">python</span> <span class="o">-</span><span class="n">W</span> <span class="n">ignore</span> <span class="n">opacus_sync_demo</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 </div>
@@ -933,28 +933,28 @@ Additionally, to simplify the calculations, we only add noise on worker with <co
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=78da9b43-d92a-436f-b000-4b633e85479a"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Cleanup">Cleanup<a class="anchor-link" href="#Cleanup">¶</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=1cf71582-6808-4fb8-b7b0-9afb462b75b8">
 <div class="input">
 <div class="prompt input_prompt">In [15]:</div>
 <div class="inner_cell">
 <div class="input_area">
 <div class="highlight hl-ipython3"><pre><span></span>%%bash
-rm opacus_ddp_demo.py
-rm opacus_distributed_data_loader_demo.py
-rm opacus_sync_demo.py
+rm<span class="w"> </span>opacus_ddp_demo.py
+rm<span class="w"> </span>opacus_distributed_data_loader_demo.py
+rm<span class="w"> </span>opacus_sync_demo.py
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-</div></div><div class="tutorialButtonWrapper buttonWrapper"><a class="tutorialButton button" download="" href="https://github.com/pytorch/opacus/blob/main/tutorials/ddp_tutorial.ipynb" target="_blank"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-download" class="svg-inline--fa fa-file-download fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm76.45 211.36l-96.42 95.7c-6.65 6.61-17.39 6.61-24.04 0l-96.42-95.7C73.42 337.29 80.54 320 94.82 320H160v-80c0-8.84 7.16-16 16-16h32c8.84 0 16 7.16 16 16v80h65.18c14.28 0 21.4 17.29 11.27 27.36zM377 105L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1c0-6.3-2.5-12.4-7-16.9z"></path></svg>Download Tutorial Jupyter Notebook</a></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div><div class="tutorialButtonWrapper buttonWrapper"><a class="tutorialButton button" download="" href="https://github.com/pytorch/opacus/blob/main/tutorials/ddp_tutorial.ipynb" target="_blank"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-download" class="svg-inline--fa fa-file-download fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm76.45 211.36l-96.42 95.7c-6.65 6.61-17.39 6.61-24.04 0l-96.42-95.7C73.42 337.29 80.54 320 94.82 320H160v-80c0-8.84 7.16-16 16-16h32c8.84 0 16 7.16 16 16v80h65.18c14.28 0 21.4 17.29 11.27 27.36zM377 105L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1c0-6.3-2.5-12.4-7-16.9z"></path></svg>Download Tutorial Jupyter Notebook</a></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

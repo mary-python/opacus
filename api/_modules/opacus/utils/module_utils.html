@@ -58,8 +58,12 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="parametrized_modules"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.parametrized_modules">[docs]</a><span class="k">def</span> <span class="nf">parametrized_modules</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]:</span>
-    <span class="sd">"""</span>
+<span class="k">def</span> <span class="nf">has_trainable_params</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">recurse</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="parametrized_modules"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.parametrized_modules">[docs]</a><span class="k">def</span> <span class="nf">parametrized_modules</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Recursively iterates over all submodules, returning those that</span>
 <span class="sd">    have parameters (as opposed to "wrapper modules" that just organize modules).</span>
 <span class="sd">    """</span>
@@ -71,7 +75,7 @@
 
 
 <div class="viewcode-block" id="trainable_modules"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.trainable_modules">[docs]</a><span class="k">def</span> <span class="nf">trainable_modules</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]]:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Recursively iterates over all submodules, returning those that</span>
 <span class="sd">    have parameters and are trainable (ie they want a grad).</span>
 <span class="sd">    """</span>
@@ -83,7 +87,7 @@
 
 
 <div class="viewcode-block" id="trainable_parameters"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.trainable_parameters">[docs]</a><span class="k">def</span> <span class="nf">trainable_parameters</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]]:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Recursively iterates over all parameters, returning those that</span>
 <span class="sd">    are trainable (ie they want a grad).</span>
 <span class="sd">    """</span>
@@ -93,13 +97,13 @@
 
 
 <div class="viewcode-block" id="requires_grad"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.requires_grad">[docs]</a><span class="k">def</span> <span class="nf">requires_grad</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">recurse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Checks if any parameters in a specified module require gradients.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        module: PyTorch module whose parameters are to be examined.</span>
 <span class="sd">        recurse: Flag specifying if the gradient requirement check should</span>
-<span class="sd">            be applied recursively to sub-modules of the specified module</span>
+<span class="sd">            be applied recursively to submodules of the specified module</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Flag indicate if any parameters require gradients</span>
@@ -109,7 +113,7 @@
 
 
 <div class="viewcode-block" id="clone_module"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.clone_module">[docs]</a><span class="k">def</span> <span class="nf">clone_module</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Handy utility to clone an nn.Module. PyTorch doesn't always support copy.deepcopy(), so it is</span>
 <span class="sd">    just easier to serialize the model to a BytesIO and read it from there.</span>
 
@@ -130,7 +134,7 @@
 
 
 <div class="viewcode-block" id="get_submodule"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.get_submodule">[docs]</a><span class="k">def</span> <span class="nf">get_submodule</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns the submodule given by target if it exists, otherwise throws an error.</span>
 
 <span class="sd">    This is copy-pasta of Pytorch 1.9's ``get_submodule()`` implementation; and is</span>
@@ -169,7 +173,7 @@
 
 
 <div class="viewcode-block" id="are_state_dict_equal"><a class="viewcode-back" href="../../../utils/module_utils.html#opacus.utils.module_utils.are_state_dict_equal">[docs]</a><span class="k">def</span> <span class="nf">are_state_dict_equal</span><span class="p">(</span><span class="n">sd1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">sd2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compares two state dicts, while logging discrepancies</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sd1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sd2</span><span class="p">):</span>
@@ -229,7 +233,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

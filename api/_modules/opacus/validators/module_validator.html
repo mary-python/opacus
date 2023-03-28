@@ -55,7 +55,7 @@
 
 
 <div class="viewcode-block" id="ModuleValidator"><a class="viewcode-back" href="../../../validator.html#opacus.validators.module_validator.ModuleValidator">[docs]</a><span class="k">class</span> <span class="nc">ModuleValidator</span><span class="p">:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Encapsulates all the validation logic required by Opacus.</span>
 <span class="sd">    Also works as a namespace to hold registered validators and fixers.</span>
 <span class="sd">    """</span>
@@ -67,9 +67,9 @@
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">UnsupportedModuleError</span><span class="p">]:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Validate module and sub_modules by running registered custom validators.</span>
-<span class="sd">        Returns or raises excpetions depending on ``strict`` flag.</span>
+<span class="sd">        Returns or raises exceptions depending on ``strict`` flag.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            module: The root module to validate.</span>
@@ -99,7 +99,7 @@
 
 <div class="viewcode-block" id="ModuleValidator.is_valid"><a class="viewcode-back" href="../../../validator.html#opacus.validators.module_validator.ModuleValidator.is_valid">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if module and sub_modules are valid by running registered custom validators.</span>
 
 <span class="sd">        Args:</span>
@@ -112,7 +112,7 @@
 
 <div class="viewcode-block" id="ModuleValidator.fix"><a class="viewcode-back" href="../../../validator.html#opacus.validators.module_validator.ModuleValidator.fix">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Make the module and sub_modules DP compatible by running registered custom fixers.</span>
 
 <span class="sd">        Args:</span>
@@ -125,20 +125,20 @@
         <span class="n">module</span> <span class="o">=</span> <span class="n">clone_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
         <span class="c1"># iterate over all sub_modules</span>
         <span class="c1"># We have to get sub_module names in a list first as we will be</span>
-        <span class="c1"># changing the modules inside the the loop.</span>
+        <span class="c1"># changing the modules inside the loop.</span>
         <span class="n">sub_module_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">trainable_modules</span><span class="p">(</span><span class="n">module</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">sub_module_name</span> <span class="ow">in</span> <span class="n">sub_module_names</span><span class="p">:</span>
             <span class="c1"># get sub_module</span>
             <span class="n">sub_module</span> <span class="o">=</span> <span class="n">get_submodule</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">sub_module_name</span><span class="p">)</span>
             <span class="c1"># if sub_module has a registered fixer</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sub_module</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ModuleValidator</span><span class="o">.</span><span class="n">FIXERS</span><span class="p">:</span>
-                <span class="c1"># get a repalcement for sub_module</span>
+                <span class="c1"># get a replacement for sub_module</span>
                 <span class="n">sub_module_fixer</span> <span class="o">=</span> <span class="n">ModuleValidator</span><span class="o">.</span><span class="n">FIXERS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">sub_module</span><span class="p">)]</span>
                 <span class="n">new_sub_module</span> <span class="o">=</span> <span class="n">sub_module_fixer</span><span class="p">(</span><span class="n">sub_module</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="c1"># move new_sub_module to the same device as that of sub_module</span>
                 <span class="n">new_sub_module</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sub_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
                 <span class="c1"># get module after replacement.</span>
-                <span class="n">module</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_repalce_sub_module</span><span class="p">(</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_replace_sub_module</span><span class="p">(</span>
                     <span class="n">root</span><span class="o">=</span><span class="n">module</span><span class="p">,</span>
                     <span class="n">sub_module_name</span><span class="o">=</span><span class="n">sub_module_name</span><span class="p">,</span>
                     <span class="n">new_sub_module</span><span class="o">=</span><span class="n">new_sub_module</span><span class="p">,</span>
@@ -152,7 +152,7 @@
         <span class="k">return</span> <span class="n">module</span></div>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_repalce_sub_module</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_replace_sub_module</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
@@ -164,7 +164,7 @@
             <span class="nb">len</span><span class="p">(</span><span class="n">sub_module_path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sub_module_path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">""</span>
         <span class="p">):</span>  <span class="c1"># root is the only sub_module of root</span>
             <span class="k">return</span> <span class="n">new_sub_module</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># repalce root's descendant</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># replace root's descendant</span>
             <span class="n">sub_module_parent</span> <span class="o">=</span> <span class="n">root</span>
             <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sub_module_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># descend down to sub_module</span>
                 <span class="n">sub_module_parent</span> <span class="o">=</span> <span class="n">sub_module_parent</span><span class="o">.</span><span class="n">_modules</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
@@ -173,11 +173,11 @@
 
 <div class="viewcode-block" id="ModuleValidator.fix_and_validate"><a class="viewcode-back" href="../../../validator.html#opacus.validators.module_validator.ModuleValidator.fix_and_validate">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fix_and_validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Fix the module and sub_modules first, and then run validation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            module: The root module to be fixed and validted</span>
+<span class="sd">            module: The root module to be fixed and validated</span>
 <span class="sd">            **kwargs: Arbitrary keyword arguments.</span>
 
 <span class="sd">        Returns:</span>
@@ -237,7 +237,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

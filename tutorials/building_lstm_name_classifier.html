@@ -86,7 +86,7 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In this tutorial we will build a differentially-private LSTM model to classify names to their source languages, which is the same task as in the tutorial <strong>NLP From Scratch</strong> (<a href="https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html">https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html</a>). Since the objective of this tutorial is to demonstrate the effective use of an LSTM with privacy guarantees, we will be utilizing it in place of the bare-bones RNN model defined in the original tutorial. Specifically, we use the <code>DPLSTM</code> module from <code>opacus.layers.dp_lstm</code> to facilitate calculation of the per-example gradients, which are utilized in the addition of noise during application of differential privacy. <code>DPLSTM</code> has the same API and functionality as the <code>nn.LSTM</code>, with some restrictions (ex. we currently support single layers, the full list is given below).</p>
+<p>In this tutorial, we will build a differentially-private LSTM model to classify names to their source languages, which is the same task as in the tutorial <strong>NLP From Scratch</strong> (<a href="https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html">https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html</a>). Since the objective of this tutorial is to demonstrate the effective use of an LSTM with privacy guarantees, we will be utilizing it in place of the bare-bones RNN model defined in the original tutorial. Specifically, we use the <code>DPLSTM</code> module from <code>opacus.layers.dp_lstm</code> to facilitate the calculation of the per-example gradients, which are utilized in the addition of noise during the application of differential privacy. <code>DPLSTM</code> has the same API and functionality as the <code>nn.LSTM</code>, with some restrictions (ex. we currently support single layers, the full list is given below).</p>
 </div>
 </div>
 </div>
@@ -187,7 +187,7 @@ Completed!
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
 <span class="k">class</span> <span class="nc">CharByteEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This encoder takes a UTF-8 string and encodes its bytes into a Tensor. It can also</span>
 <span class="sd">    perform the opposite operation to check a result.</span>
 <span class="sd">    Examples:</span>
@@ -207,7 +207,7 @@ Completed!
         <span class="bp">self</span><span class="o">.</span><span class="n">pad_idx</span> <span class="o">=</span> <span class="mi">258</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pad_to</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Encodes a string. It will append a start token &lt;s&gt; (id=self.start_idx) and an end token &lt;/s&gt;</span>
 <span class="sd">        (id=self.end_idx).</span>
 <span class="sd">        Args:</span>
@@ -227,8 +227,8 @@ Completed!
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_ids_tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">"""</span>
-<span class="sd">        The inverse of `forward`. Keeps the start, end and pad indices.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The inverse of `forward`. Keeps the start, end, and pad indices.</span>
 <span class="sd">        """</span>
         <span class="n">char_ids</span> <span class="o">=</span> <span class="n">char_ids_tensor</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
@@ -253,7 +253,7 @@ Completed!
         <span class="k">return</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        The length of our encoder space. This is fixed to 256 (one byte) + 3 special chars</span>
 <span class="sd">        (start, end, pad).</span>
 <span class="sd">        Returns:</span>
@@ -667,7 +667,7 @@ Completed!
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Finally we can start training! We will be training for 50 epochs iterations (where each epoch corresponds to a pass over the whole dataset). We will be reporting the privacy epsilon every <code>test_every</code> epochs. We will also benchmark this differentially-private model against a model without privacy and obtain almost identical performance. Further, the private model trained with Opacus incurs only minimal overhead in training time, with the differentially-private classifier only slightly slower (by a couple of minutes) than the non-private model.</p>
+<p>Finally, we can start training! We will be training for 50 epochs iterations (where each epoch corresponds to a pass over the whole dataset). We will be reporting the privacy epsilon every <code>test_every</code> epoch. We will also benchmark this differentially-private model against a model without privacy and obtain almost identical performance. Further, the private model trained with Opacus incurs only minimal overhead in training time, with the differentially-private classifier only slightly slower (by a couple of minutes) than the non-private model.</p>
 </div>
 </div>
 </div>
@@ -809,7 +809,7 @@ Test Accuracy: 0.752090 (ε = 11.93, δ = 8e-05)
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The differentially-private name classification model obtains a test accuracy of 0.75 with an epsilon of just under 12. This shows that we can achieve a good accuracy on this task, with minimal loss of privacy.</p>
+<p>The differentially-private name classification model obtains a test accuracy of 0.75 with an epsilon of just under 12. This shows that we can achieve good accuracy on this task, with minimal loss of privacy.</p>
 </div>
 </div>
 </div>
@@ -993,7 +993,7 @@ Test Accuracy: 0.754173
 </div>
 </div>
 </div>
-</div></div><div class="tutorialButtonWrapper buttonWrapper"><a class="tutorialButton button" download="" href="https://github.com/pytorch/opacus/blob/main/tutorials/building_lstm_name_classifier.ipynb" target="_blank"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-download" class="svg-inline--fa fa-file-download fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm76.45 211.36l-96.42 95.7c-6.65 6.61-17.39 6.61-24.04 0l-96.42-95.7C73.42 337.29 80.54 320 94.82 320H160v-80c0-8.84 7.16-16 16-16h32c8.84 0 16 7.16 16 16v80h65.18c14.28 0 21.4 17.29 11.27 27.36zM377 105L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1c0-6.3-2.5-12.4-7-16.9z"></path></svg>Download Tutorial Jupyter Notebook</a></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div><div class="tutorialButtonWrapper buttonWrapper"><a class="tutorialButton button" download="" href="https://github.com/pytorch/opacus/blob/main/tutorials/building_lstm_name_classifier.ipynb" target="_blank"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-download" class="svg-inline--fa fa-file-download fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm76.45 211.36l-96.42 95.7c-6.65 6.61-17.39 6.61-24.04 0l-96.42-95.7C73.42 337.29 80.54 320 94.82 320H160v-80c0-8.84 7.16-16 16-16h32c8.84 0 16 7.16 16 16v80h65.18c14.28 0 21.4 17.29 11.27 27.36zM377 105L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1c0-6.3-2.5-12.4-7-16.9z"></path></svg>Download Tutorial Jupyter Notebook</a></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

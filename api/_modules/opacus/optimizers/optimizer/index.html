@@ -46,7 +46,7 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">opacus.optimizers.utils</span> <span class="kn">import</span> <span class="n">params</span>
-<span class="kn">from</span> <span class="nn">opt_einsum</span> <span class="kn">import</span> <span class="n">contract</span>
+<span class="kn">from</span> <span class="nn">opt_einsum.contract</span> <span class="kn">import</span> <span class="n">contract</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
 
@@ -55,7 +55,7 @@
 
 
 <span class="k">def</span> <span class="nf">_mark_as_processed</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Marks parameters that have already been used in the optimizer step.</span>
 
 <span class="sd">    DP-SGD puts certain restrictions on how gradients can be accumulated. In particular,</span>
@@ -79,7 +79,7 @@
 
 
 <span class="k">def</span> <span class="nf">_check_processed_flag_tensor</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Checks if this gradient tensor has been previously used in optimization step.</span>
 
 <span class="sd">    See Also:</span>
@@ -103,7 +103,7 @@
 
 
 <span class="k">def</span> <span class="nf">_check_processed_flag</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Checks if this gradient tensor (or a list of tensors) has been previously</span>
 <span class="sd">    used in optimization step.</span>
 
@@ -132,7 +132,7 @@
     <span class="n">generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">secure_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generates noise according to a Gaussian distribution with mean 0</span>
 
 <span class="sd">    Args:</span>
@@ -140,7 +140,7 @@
 <span class="sd">        reference: The reference Tensor to get the appropriate shape and device</span>
 <span class="sd">            for generating the noise</span>
 <span class="sd">        generator: The PyTorch noise generator</span>
-<span class="sd">        secure_mode: boolean showing if "secure" noise need to be generate</span>
+<span class="sd">        secure_mode: boolean showing if "secure" noise need to be generated</span>
 <span class="sd">            (see the notes)</span>
 
 <span class="sd">    Notes:</span>
@@ -194,7 +194,7 @@
 
 
 <div class="viewcode-block" id="DPOptimizer"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer">[docs]</a><span class="k">class</span> <span class="nc">DPOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    ``torch.optim.Optimizer`` wrapper that adds additional functionality to clip per</span>
 <span class="sd">    sample gradients and add Gaussian noise.</span>
 
@@ -213,7 +213,7 @@
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; module = MyCustomModel()</span>
 <span class="sd">        &gt;&gt;&gt; optimizer = torch.optim.SGD(module.parameters(), lr=0.1)</span>
-<span class="sd">        &gt;&gt;&gt; dp_optimzer = DPOptimizer(</span>
+<span class="sd">        &gt;&gt;&gt; dp_optimizer = DPOptimizer(</span>
 <span class="sd">        ...     optimizer=optimizer,</span>
 <span class="sd">        ...     noise_multiplier=1.0,</span>
 <span class="sd">        ...     max_grad_norm=1.0,</span>
@@ -232,7 +232,7 @@
         <span class="n">generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">secure_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            optimizer: wrapped optimizer.</span>
@@ -277,7 +277,7 @@
             <span class="n">p</span><span class="o">.</span><span class="n">summed_grad</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_get_flat_grad_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return parameter's per sample gradients as a single tensor.</span>
 
 <span class="sd">        By default, per sample gradients (``p.grad_sample``) are stored as one tensor per</span>
@@ -319,7 +319,7 @@
         <span class="k">return</span> <span class="n">ret</span>
 
 <div class="viewcode-block" id="DPOptimizer.signal_skip_step"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.signal_skip_step">[docs]</a>    <span class="k">def</span> <span class="nf">signal_skip_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_skip</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Signals the optimizer to skip an optimization step and only perform clipping and</span>
 <span class="sd">        per sample gradient accumulation.</span>
 
@@ -341,7 +341,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_step_skip_queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">do_skip</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_check_skip_next_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_next</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Checks if next step should be skipped by the optimizer.</span>
 <span class="sd">        This is for large Poisson batches that get split into smaller physical batches</span>
 <span class="sd">        to fit on the device. Batches that do not correspond to the end of a Poisson</span>
@@ -357,14 +357,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns a flat list of ``nn.Parameter`` managed by the optimizer</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grad_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns a flat list of per sample gradient tensors (one per parameter)</span>
 <span class="sd">        """</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
@@ -374,7 +374,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">accumulated_iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns number of batches currently accumulated and not yet processed.</span>
 
 <span class="sd">        In other words ``accumulated_iterations`` tracks the number of forward/backward</span>
@@ -403,7 +403,7 @@
         <span class="k">return</span> <span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <div class="viewcode-block" id="DPOptimizer.attach_step_hook"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.attach_step_hook">[docs]</a>    <span class="k">def</span> <span class="nf">attach_step_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DPOptimizer</span><span class="p">],</span> <span class="kc">None</span><span class="p">]):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Attaches a hook to be executed after gradient clipping/noising, but before the</span>
 <span class="sd">        actual optimization step.</span>
 
@@ -416,18 +416,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">step_hook</span> <span class="o">=</span> <span class="n">fn</span></div>
 
 <div class="viewcode-block" id="DPOptimizer.clip_and_accumulate"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.clip_and_accumulate">[docs]</a>    <span class="k">def</span> <span class="nf">clip_and_accumulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Performs gradient clipping.</span>
 <span class="sd">        Stores clipped and aggregated gradients into `p.summed_grad```</span>
 <span class="sd">        """</span>
 
-        <span class="n">per_param_norms</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">g</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">ndim</span><span class="p">)))</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_samples</span>
-        <span class="p">]</span>
-        <span class="n">per_sample_norms</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">per_param_norms</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">per_sample_clip_factor</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_grad_norm</span> <span class="o">/</span> <span class="p">(</span><span class="n">per_sample_norms</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">))</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
-            <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grad_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Empty batch</span>
+            <span class="n">per_sample_clip_factor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">per_param_norms</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">g</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_samples</span>
+            <span class="p">]</span>
+            <span class="n">per_sample_norms</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">per_param_norms</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">per_sample_clip_factor</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_grad_norm</span> <span class="o">/</span> <span class="p">(</span><span class="n">per_sample_norms</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
             <span class="n">_check_processed_flag</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">grad_sample</span><span class="p">)</span>
@@ -442,7 +446,7 @@
             <span class="n">_mark_as_processed</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">grad_sample</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DPOptimizer.add_noise"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.add_noise">[docs]</a>    <span class="k">def</span> <span class="nf">add_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Adds noise to clipped gradients. Stores clipped and noised result in ``p.grad``</span>
 <span class="sd">        """</span>
 
@@ -460,7 +464,7 @@
             <span class="n">_mark_as_processed</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">summed_grad</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DPOptimizer.scale_grad"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.scale_grad">[docs]</a>    <span class="k">def</span> <span class="nf">scale_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Applies given ``loss_reduction`` to ``p.grad``.</span>
 
 <span class="sd">        Does nothing if ``loss_reduction="sum"``. Divides gradients by</span>
@@ -471,7 +475,7 @@
                 <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_batch_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">accumulated_iterations</span></div>
 
 <div class="viewcode-block" id="DPOptimizer.zero_grad"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.zero_grad">[docs]</a>    <span class="k">def</span> <span class="nf">zero_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_to_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Clear gradients.</span>
 
 <span class="sd">        Clears ``p.grad``, ``p.grad_sample`` and ``p.summed_grad`` for all of it's parameters</span>
@@ -506,7 +510,7 @@
 <div class="viewcode-block" id="DPOptimizer.pre_step"><a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.pre_step">[docs]</a>    <span class="k">def</span> <span class="nf">pre_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Perform actions specific to ``DPOptimizer`` before calling</span>
 <span class="sd">        underlying  ``optimizer.step()``</span>
 
@@ -591,7 +595,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

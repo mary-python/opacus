@@ -52,11 +52,11 @@
 
 
 <div class="viewcode-block" id="BatchSplittingSampler"><a class="viewcode-back" href="../../../batch_memory_manager.html#opacus.utils.batch_memory_manager.BatchSplittingSampler">[docs]</a><span class="k">class</span> <span class="nc">BatchSplittingSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Samples according to the underlying instance of ``Sampler``, but splits</span>
 <span class="sd">    the index sequences into smaller chunks.</span>
 
-<span class="sd">    Used to split large logical batches into physocal batches of a smaller size,</span>
+<span class="sd">    Used to split large logical batches into physical batches of a smaller size,</span>
 <span class="sd">    while coordinating with DPOptimizer when the logical batch has ended.</span>
 <span class="sd">    """</span>
 
@@ -67,7 +67,7 @@
         <span class="n">max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">DPOptimizer</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">"""</span>
+<span class="w">        </span><span class="sd">"""</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sampler: Wrapped Sampler instance</span>
@@ -80,6 +80,11 @@
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">batch_idxs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_idxs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">signal_skip_step</span><span class="p">(</span><span class="n">do_skip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="p">[]</span>
+                <span class="k">continue</span>
+
             <span class="n">split_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span>
                 <span class="n">batch_idxs</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batch_idxs</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_batch_size</span><span class="p">)</span>
             <span class="p">)</span>
@@ -107,7 +112,7 @@
 <div class="viewcode-block" id="wrap_data_loader"><a class="viewcode-back" href="../../../batch_memory_manager.html#opacus.utils.batch_memory_manager.wrap_data_loader">[docs]</a><span class="k">def</span> <span class="nf">wrap_data_loader</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">:</span> <span class="n">DPOptimizer</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Replaces batch_sampler in the input data loader with ``BatchSplittingSampler``</span>
 
 <span class="sd">    Args:</span>
@@ -139,12 +144,12 @@
 
 
 <div class="viewcode-block" id="BatchMemoryManager"><a class="viewcode-back" href="../../../batch_memory_manager.html#opacus.utils.batch_memory_manager.BatchMemoryManager">[docs]</a><span class="k">class</span> <span class="nc">BatchMemoryManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">"""</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Context manager to manage memory consumption during training.</span>
 
 <span class="sd">    Allows setting hard limit on the physical batch size as a just one line code change.</span>
 <span class="sd">    Can be used both for simulating large logical batches with limited memory and for</span>
-<span class="sd">    safeguarding against occasinal large batches produced by</span>
+<span class="sd">    safeguarding against occasional large batches produced by</span>
 <span class="sd">    :class:`~opacus.utils.uniform_sampler.UniformWithReplacementSampler`.</span>
 
 <span class="sd">    Note that it doesn't modify the input DataLoader, you'd need to use new DataLoader</span>
@@ -152,8 +157,8 @@
 
 <span class="sd">    BatchSplittingSampler will split large logical batches into smaller sub-batches with</span>
 <span class="sd">    certain maximum size.</span>
-<span class="sd">    On every step optimzer will check if the batch was the last physical batch comprising</span>
-<span class="sd">    a logical one, and will change behaviour accordignly.</span>
+<span class="sd">    On every step optimizer will check if the batch was the last physical batch comprising</span>
+<span class="sd">    a logical one, and will change behaviour accordingly.</span>
 
 <span class="sd">    If it was not the last, ``optimizer.step()`` will only clip per sample gradients and</span>
 <span class="sd">    sum them into ``p.summed_grad`.` ``optimizer.zero_grad()`` will clear ``p.grad_sample``,</span>
@@ -163,8 +168,8 @@
 <span class="sd">    ``optimizer.step()`` and ``optimizer.zero_grad()`` will behave normally.</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # Assuming you've initialized you objects and passed them to PrivacyEngine.</span>
-<span class="sd">        &gt;&gt;&gt; # For this example we assume data_loader is initalized with batch_size=4</span>
+<span class="sd">        &gt;&gt;&gt; # Assuming you've initialized your objects and passed them to PrivacyEngine.</span>
+<span class="sd">        &gt;&gt;&gt; # For this example we assume data_loader is initialized with batch_size=4</span>
 <span class="sd">        &gt;&gt;&gt; model, optimizer, data_loader = _init_private_training()</span>
 <span class="sd">        &gt;&gt;&gt; criterion = nn.CrossEntropyLoss()</span>
 <span class="sd">        &gt;&gt;&gt; with BatchMemoryManager(</span>
@@ -246,7 +251,7 @@
 </div>
 </div>
 <div class="clearer"></div>
-</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;

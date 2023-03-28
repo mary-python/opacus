@@ -79,7 +79,7 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
+<h1>Table of Contents<span class="tocSkip"></span></h1>
 <div class="toc"><ul class="toc-item"><li><span><a data-toc-modified-id="Building-an-Image-Classifier-with-Differential-Privacy-1" href="#Building-an-Image-Classifier-with-Differential-Privacy">Building an Image Classifier with Differential Privacy</a></span><ul class="toc-item"><li><span><a data-toc-modified-id="Overview-1.1" href="#Overview">Overview</a></span></li><li><span><a data-toc-modified-id="Hyper-parameters-1.2" href="#Hyper-parameters">Hyper-parameters</a></span></li><li><span><a data-toc-modified-id="Data-1.3" href="#Data">Data</a></span></li><li><span><a data-toc-modified-id="Model-1.4" href="#Model">Model</a></span></li><li><span><a data-toc-modified-id="Prepare-for-Training-1.5" href="#Prepare-for-Training">Prepare for Training</a></span></li><li><span><a data-toc-modified-id="Train-the-network-1.6" href="#Train-the-network">Train the network</a></span></li><li><span><a data-toc-modified-id="Test-the-network-on-test-data-1.7" href="#Test-the-network-on-test-data">Test the network on test data</a></span></li><li><span><a data-toc-modified-id="Tips-and-Tricks-1.8" href="#Tips-and-Tricks">Tips and Tricks</a></span></li><li><span><a data-toc-modified-id="Private-Model-vs-Non-Private-Model-Performance-1.9" href="#Private-Model-vs-Non-Private-Model-Performance">Private Model vs Non-Private Model Performance</a></span></li></ul></li></ul></div>
 </div>
 </div>
@@ -96,8 +96,8 @@
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Overview">Overview<a class="anchor-link" href="#Overview">¶</a></h2><p>In this tutorial we will learn to do the following:</p>
 <ol>
-<li>Learn about privacy specific hyper-parameters related to DP-SGD </li>
-<li>Learn about ModelInspector, incompatible layers, and use model rewriting utility. </li>
+<li>Learn about privacy-specific hyper-parameters related to DP-SGD</li>
+<li>Learn about ModelInspector, incompatible layers, and use model rewriting utility.</li>
 <li>Train a differentially private ResNet18 for image classification.</li>
 </ol>
 </div>
@@ -145,8 +145,8 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>There's another constraint we should be mindful of—memory. To balance peak memory requirement, which is proportional to <code>batch_size^2</code>, and training performance, we will be using BatchMemoryManager. It separates the logical batch size (which defines how often the model is updated and how much DP noise is added), and a physical batch size (which defines how many samples do we process at a time).</p>
-<p>With BatchMemoryManager you will create your DataLoader with a logical batch size, and then provide maximum physical batch size to the memory manager.</p>
+<p>There's another constraint we should be mindful of—memory. To balance peak memory requirement, which is proportional to <code>batch_size^2</code>, and training performance, we will be using BatchMemoryManager. It separates the logical batch size (which defines how often the model is updated and how much DP noise is added), and a physical batch size (which defines how many samples we process at a time).</p>
+<p>With BatchMemoryManager you will create your DataLoader with a logical batch size, and then provide the maximum physical batch size to the memory manager.</p>
 </div>
 </div>
 </div>
@@ -186,7 +186,7 @@
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 
 <span class="c1"># These values, specific to the CIFAR10 dataset, are assumed to be known.</span>
-<span class="c1"># If necessary, they can be computed with modest privacy budget.</span>
+<span class="c1"># If necessary, they can be computed with modest privacy budgets.</span>
 <span class="n">CIFAR10_MEAN</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.4914</span><span class="p">,</span> <span class="mf">0.4822</span><span class="p">,</span> <span class="mf">0.4465</span><span class="p">)</span>
 <span class="n">CIFAR10_STD_DEV</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2023</span><span class="p">,</span> <span class="mf">0.1994</span><span class="p">,</span> <span class="mf">0.2010</span><span class="p">)</span>
 
@@ -501,7 +501,7 @@ You can see, that after this, no exception is raised</p>
                 <span class="nb">print</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Train Epoch: </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2">"</span>
                     <span class="sa">f</span><span class="s2">"Loss: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> "</span>
-                    <span class="sa">f</span><span class="s2">"Acc@1: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">top1_acc</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> "</span>
+                    <span class="sa">f</span><span class="s2">"Acc@1: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">top1_acc</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> "</span>
                     <span class="sa">f</span><span class="s2">"(ε = </span><span class="si">{</span><span class="n">epsilon</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, δ = </span><span class="si">{</span><span class="n">DELTA</span><span class="si">}</span><span class="s2">)"</span>
                 <span class="p">)</span>
 </pre></div>
@@ -546,7 +546,7 @@ You can see, that after this, no exception is raised</p>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Test set:"</span>
         <span class="sa">f</span><span class="s2">"Loss: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> "</span>
-        <span class="sa">f</span><span class="s2">"Acc: </span><span class="si">{</span><span class="n">top1_avg</span> <span class="o">*</span> <span class="mi">100</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> "</span>
+        <span class="sa">f</span><span class="s2">"Acc: </span><span class="si">{</span><span class="n">top1_avg</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> "</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">top1_acc</span><span class="p">)</span>
 </pre></div>
@@ -677,7 +677,8 @@ You can see, that after this, no exception is raised</p>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <table>
-<thead><tr>
+<thead>
+<tr>
 <th>Model</th>
 <th>Top 1 Accuracy (%)</th>
 <th>ϵ</th>
@@ -699,7 +700,7 @@ You can see, that after this, no exception is raised</p>
 </div>
 </div>
 </div>
-</div></div><div class="tutorialButtonWrapper buttonWrapper"><a class="tutorialButton button" download="" href="https://github.com/pytorch/opacus/blob/main/tutorials/building_image_classifier.ipynb" target="_blank"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-download" class="svg-inline--fa fa-file-download fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm76.45 211.36l-96.42 95.7c-6.65 6.61-17.39 6.61-24.04 0l-96.42-95.7C73.42 337.29 80.54 320 94.82 320H160v-80c0-8.84 7.16-16 16-16h32c8.84 0 16 7.16 16 16v80h65.18c14.28 0 21.4 17.29 11.27 27.36zM377 105L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1c0-6.3-2.5-12.4-7-16.9z"></path></svg>Download Tutorial Jupyter Notebook</a></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2022 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</div></div><div class="tutorialButtonWrapper buttonWrapper"><a class="tutorialButton button" download="" href="https://github.com/pytorch/opacus/blob/main/tutorials/building_image_classifier.ipynb" target="_blank"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-download" class="svg-inline--fa fa-file-download fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm76.45 211.36l-96.42 95.7c-6.65 6.61-17.39 6.61-24.04 0l-96.42-95.7C73.42 337.29 80.54 320 94.82 320H160v-80c0-8.84 7.16-16 16-16h32c8.84 0 16 7.16 16 16v80h65.18c14.28 0 21.4 17.29 11.27 27.36zM377 105L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1c0-6.3-2.5-12.4-7-16.9z"></path></svg>Download Tutorial Jupyter Notebook</a></div></div></div></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/opacus_favicon.svg" alt="Opacus" width="66" height="58"/></a><div class="footerSection"><h5>Docs</h5><a href="/docs/introduction">Introduction</a><a href="/docs/faq">FAQ</a><a href="/tutorials/">Tutorials</a><a href="/api/">API Reference</a></div><div class="footerSection"><h5>Github</h5><div class="social"><a class="github-button" href="https://github.com/pytorch/opacus" data-count-href="https://github.com/pytorch/opacus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star Opacus on GitHub">opacus</a></div></div><div class="footerSection"><h5>Legal</h5><a href="https://opensource.facebook.com/legal/privacy/" target="_blank" rel="noreferrer noopener">Privacy</a><a href="https://opensource.facebook.com/legal/terms/" target="_blank" rel="noreferrer noopener">Terms</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Meta Open Source" width="250" height="95"/></a><section class="copyright"> Copyright © 2023 Meta Platforms, Inc.</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;
