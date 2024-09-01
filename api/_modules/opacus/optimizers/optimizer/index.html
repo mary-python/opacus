@@ -42,16 +42,17 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">opacus.optimizers.utils</span> <span class="kn">import</span> <span class="n">params</span>
-<span class="kn">from</span> <span class="nn">opt_einsum.contract</span> <span class="kn">import</span> <span class="n">contract</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
 
 
 <span class="k">def</span> <span class="nf">_mark_as_processed</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]):</span>
@@ -268,10 +269,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">step_hook</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">generator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">secure_mode</span> <span class="o">=</span> <span class="n">secure_mode</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">param_groups</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">defaults</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_step_skip_queue</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_last_step_skipped</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -407,6 +404,48 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">param_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Returns a list containing a dictionary of all parameters managed by the optimizer.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">param_groups</span>
+
+    <span class="nd">@param_groups</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">param_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Updates the param_groups of the optimizer.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">param_groups</span> <span class="o">=</span> <span class="n">param_groups</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">defaultdict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Returns a dictionary holding current optimization state.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">state</span>
+
+    <span class="nd">@state</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Updates the state of the optimizer.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Returns a dictionary containing default values for optimization.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">defaults</span>
+
+    <span class="nd">@defaults</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Updates the defaults of the optimizer.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span>
+
 <div class="viewcode-block" id="DPOptimizer.attach_step_hook">
 <a class="viewcode-back" href="../../../optim/dp_optimizer.html#opacus.optimizers.optimizer.DPOptimizer.attach_step_hook">[docs]</a>
     <span class="k">def</span> <span class="nf">attach_step_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DPOptimizer</span><span class="p">],</span> <span class="kc">None</span><span class="p">]):</span>
@@ -419,7 +458,6 @@
 <span class="sd">        Args:</span>
 <span class="sd">            fn: hook function. Expected signature: ``foo(optim: DPOptimizer)``</span>
 <span class="sd">        """</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">step_hook</span> <span class="o">=</span> <span class="n">fn</span></div>
 
 
@@ -448,7 +486,7 @@
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
             <span class="n">_check_processed_flag</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">grad_sample</span><span class="p">)</span>
             <span class="n">grad_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_flat_grad_sample</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-            <span class="n">grad</span> <span class="o">=</span> <span class="n">contract</span><span class="p">(</span><span class="s2">"i,i..."</span><span class="p">,</span> <span class="n">per_sample_clip_factor</span><span class="p">,</span> <span class="n">grad_sample</span><span class="p">)</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">"i,i..."</span><span class="p">,</span> <span class="n">per_sample_clip_factor</span><span class="p">,</span> <span class="n">grad_sample</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">summed_grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">p</span><span class="o">.</span><span class="n">summed_grad</span> <span class="o">+=</span> <span class="n">grad</span>
@@ -546,18 +584,14 @@
         <span class="c1"># Essentially the DPOptimizer act as a normal optimizer</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_samples</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grad_samples</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">clip_and_accumulate</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_skip_next_step</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_is_last_step_skipped</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">return</span> <span class="kc">False</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">add_noise</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scale_grad</span><span class="p">()</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_hook</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">step_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_last_step_skipped</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
@@ -568,7 +602,6 @@
         <span class="k">if</span> <span class="n">closure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
                 <span class="n">closure</span><span class="p">()</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_step</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -594,10 +627,18 @@
 </div>
 </div>
 </div>
-<div aria-label="main navigation" class="sphinxsidebar" role="navigation">
+<div aria-label="Main" class="sphinxsidebar" role="navigation">
 <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../../index.html">Opacus</a></h1>
-<h3>Navigation</h3>
+<search id="searchbox" role="search" style="display: none">
+<div class="searchformwrapper">
+<form action="../../../search.html" class="search" method="get">
+<input aria-labelledby="searchlabel" autocapitalize="off" autocomplete="off" autocorrect="off" name="q" placeholder="Search" spellcheck="false" type="text"/>
+<input type="submit" value="Go"/>
+</form>
+</div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../privacy_engine.html">Privacy Engine</a></li>
@@ -622,16 +663,6 @@
 </ul></li>
 </ul>
 </div>
-<search id="searchbox" role="search" style="display: none">
-<h3 id="searchlabel">Quick search</h3>
-<div class="searchformwrapper">
-<form action="../../../search.html" class="search" method="get">
-<input aria-labelledby="searchlabel" autocapitalize="off" autocomplete="off" autocorrect="off" name="q" spellcheck="false" type="text"/>
-<input type="submit" value="Go"/>
-</form>
-</div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 </div>
 </div>
 <div class="clearer"></div>
